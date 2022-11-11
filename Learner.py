@@ -151,8 +151,8 @@ class DIRILearner:
                     value = self.agent.critic(torch.tensor(state1, device=device).float().view(1,self.K,-1),
                                               torch.tensor(portfolio, device=device).float().view(1,self.K+1,-1)).cpu().detach().numpy()[0]
 
-                    cost = self.agent.cnet(torch.tensor(state1, device=device).float().view(1, self.K, -1),
-                                           torch.tensor(portfolio, device=device).float().view(1, self.K + 1,-1)).cpu().detach().numpy()[0]
+                    ex_cost = self.agent.cnet(torch.tensor(state1, device=device).float().view(1, self.K, -1),
+                                              torch.tensor(portfolio, device=device).float().view(1, self.K + 1,-1)).cpu().detach().numpy()[0]
 
                     alpha = self.agent.actor(torch.tensor(state1, device=device).float().view(1,self.K,-1),
                                              torch.tensor(portfolio, device=device).float().view(1,self.K+1,-1)).cpu().detach()[0]
@@ -160,6 +160,7 @@ class DIRILearner:
                     a = action
                     al = torch.cat([torch.tensor([1.0]), alpha], dim=-1).numpy()
                     lam = self.agent.lam
+                    grad_lam = self.agent.grad_lam
                     p = self.agent.portfolio
                     pv = self.agent.portfolio_value
                     sv = self.agent.portfolio_value_static
@@ -176,7 +177,8 @@ class DIRILearner:
                     print(f"price:{self.environment.get_price()}")
                     print(f"value:{value}")
                     print(f"lam:{lam}")
-                    print(f"cost:{cost}")
+                    print(f"grad_lam:{grad_lam}")
+                    print(f"ex_cost:{ex_cost}")
                     print(f"action:{a}")
                     print(f"maction:{m_action}")
                     print(f"gap:{a-m_action}")
