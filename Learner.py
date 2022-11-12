@@ -143,9 +143,6 @@ class DIRILearner:
                 state1 = next_state1
                 portfolio = next_portfolio
 
-                # if done:
-                #     break
-
                 if steps_done % 300 == 0:
                     np.set_printoptions(precision=4, suppress=True)
                     value = self.agent.critic(torch.tensor(state1, device=device).float().view(1,self.K,-1),
@@ -158,27 +155,22 @@ class DIRILearner:
                                              torch.tensor(portfolio, device=device).float().view(1,self.K+1,-1)).cpu().detach()[0]
 
                     a = action
-                    al = torch.cat([torch.tensor([1.0]), alpha], dim=-1).numpy()
+                    al = torch.cat([torch.tensor([1.1]), alpha], dim=-1).numpy()
                     lam = self.agent.lam
                     grad_lam = self.agent.grad_lam
                     p = self.agent.portfolio
                     pv = self.agent.portfolio_value
-                    sv = self.agent.portfolio_value_static
                     cum_fee = self.agent.cum_fee
                     stocks = self.agent.num_stocks
                     balance = self.agent.balance
-                    change = self.agent.change
-                    pi_vector = self.agent.pi_operator(change)
                     profitloss = self.agent.profitloss
                     loss = self.agent.loss
-                    tex = self.agent.TRADING_TEX
-                    charge = self.agent.TRADING_CHARGE
                     print(f"episode:{episode} ========================================================================")
                     print(f"price:{self.environment.get_price()}")
                     print(f"value:{value}")
+                    print(f"ept cost:{ex_cost}")
                     print(f"lam:{lam}")
                     print(f"grad_lam:{grad_lam}")
-                    print(f"ex_cost:{ex_cost}")
                     print(f"action:{a}")
                     print(f"maction:{m_action}")
                     print(f"gap:{a-m_action}")
@@ -186,14 +178,10 @@ class DIRILearner:
                     print(f"cum_fee:{cum_fee}")
                     print(f"alpha:{al}")
                     print(f"portfolio:{p}")
-                    print(f"pi_vector:{pi_vector}")
                     print(f"portfolio value:{pv}")
-                    print(f"static value:{sv}")
                     print(f"balance:{balance}")
                     print(f"cum reward:{cum_r}")
                     print(f"profitloss:{profitloss}")
-                    print(f"tex:{tex}")
-                    print(f"charge:{charge}")
                     print(f"loss:{loss}")
 
                 # 학습
