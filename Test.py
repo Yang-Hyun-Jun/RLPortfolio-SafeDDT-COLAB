@@ -39,10 +39,15 @@ class DIRITester:
         self.num_sell = 0
         self.num_hold = 0
 
-        self.score_net = Score().to(device)
-        self.actor = Actor(self.score_net).to(device)
-        self.critic = Critic(self.score_net, header_dim=self.K).to(device)
-        self.critic_target = Critic(self.score_net, header_dim=self.K).to(device)
+        self.score_net_actor = Score().to(device)
+        self.score_net_critic = Score().to(device)
+        self.score_net_cnet = Score().to(device)
+
+        self.actor = Actor(self.score_net_actor).to(device)
+        self.critic = Critic(self.score_net_critic, header_dim=self.K).to(device)
+        self.critic_target = Critic(self.score_net_critic, header_dim=self.K).to(device)
+        self.cnet = Critic(self.score_net_cnet, header_dim=self.K).to(device)
+        self.cnet_target = Critic(self.score_net_cnet, header_dim=self.K).to(device)
 
         self.repre = repre
         self.delta = delta
@@ -56,7 +61,8 @@ class DIRITester:
         self.agent = agent(environment=self.env, cost=self.cost,
                            actor=self.actor, K=self.K, delta=self.delta,
                            critic=self.critic, critic_target=self.critic_target,
-                           lr=0.0, tau=0.0, discount_factor=0.0,
+                           cnet=self.cnet, cnet_target=self.cnet_target,
+                           lr=0.0, lr2=0.0, tau=0.0, discount_factor=0.0, alpha=0.0,
                            min_trading_price=self.min_trading_price,
                            max_trading_price=self.max_trading_price)
 
@@ -100,6 +106,7 @@ class DIRITester:
                     action = np.zeros(shape=self.K)
 
             m_action, next_state1, next_portfolio, reward, done = self.agent.step(action, confidence)
+            self.agent.penalties.append(self.agent.portfolio[0])
             self.check_frequency(m_action)
 
             steps_done += 1

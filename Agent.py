@@ -48,6 +48,7 @@ class agent(nn.Module):
         self.delta = delta
         self.alpha = alpha
         self.discount_factor = discount_factor
+        self.penalties = []
 
         parameters = set(self.critic.parameters()) | set(self.actor.parameters()) | set(self.cnet.parameters())
         self.optimizer = torch.optim.Adam(params=parameters, lr=self.lr, weight_decay=1e-4)
