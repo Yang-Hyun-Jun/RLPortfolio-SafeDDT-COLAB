@@ -44,8 +44,8 @@ class Score(nn.Module):
         x = torch.concat([s1, s2], dim=-1)
         x = self.layer1(x)
         x = self.hidden_act(x)
-        x = self.layer2(x)
-        x = self.hidden_act(x)
+        # x = self.layer2(x)
+        # x = self.hidden_act(x)
         x = self.layer3(x)
         x = self.out_act(x)
         return x
@@ -54,7 +54,8 @@ class Score(nn.Module):
 class Actor(nn.Module):
     def __init__(self, score_net):
         super().__init__()
-        self.score_net = score_net
+        self.score_net = Score()
+        self.score_net.load_state_dict(score_net.state_dict())
 
     def forward(self, s1_tensor, portfolio):
         """
@@ -418,10 +419,10 @@ class Actor(nn.Module):
 
 
 class Critic(nn.Module):
-    def __init__(self, score_net, header_dim=None):
+    def __init__(self, score_net):
         super().__init__()
-        self.score_net = score_net
-        self.header = Header(input_dim=header_dim)
+        self.score_net = Score()
+        self.score_net.load_state_dict(score_net.state_dict())
 
     def forward(self, s1_tensor, portfolio):
 
@@ -434,48 +435,7 @@ class Critic(nn.Module):
             scores.append(globals()[f"score{j+1}"])
 
         scores = torch.cat(scores, dim=-1)
-        v = self.header(scores)
+        v = nn.Linear(s1_tensor.shape[1], 32)(scores)
+        v = nn.ReLU()(v)
+        v = nn.Linear(32, 1)(v)
         return v
-
-
-class Header(nn.Module):
-    def __init__(self, output_dim=1, input_dim=None):
-        super().__init__()
-        self.output_dim = output_dim
-        self.input_dim = input_dim
-
-        self.layer1 = nn.Linear(input_dim, 128)
-        self.layer2 = nn.Linear(128 ,64)
-        self.layer3 = nn.Linear(64, output_dim)
-        self.hidden_act = nn.ReLU()
-        self.out_act = nn.Identity()
-
-    def forward(self, scores):
-        x = self.layer1(scores)
-        x = self.hidden_act(x)
-        x = self.layer2(x)
-        x = self.hidden_act(x)
-        x = self.layer3(x)
-        x = self.out_act(x)
-        return x
-
-
-
-if __name__ == "__main__":
-    root = "/Users/mac/Downloads/alphas.npy"
-    K = 3
-    s1_tensor = torch.rand(size=(1, K, 5))
-    portfolio = torch.rand(size=(1, K+1, 1))
-
-    score_net = Score()
-    actor = Actor(score_net)
-    critic = Critic(score_net, K)
-
-    batch_num = s1_tensor.shape[0]
-    cash_alpha = torch.ones(size=(batch_num, 1), device=device) * 1.0
-    alpha = torch.cat([cash_alpha, actor(s1_tensor, portfolio)], dim=-1).detach().view(1,-1)
-
-    D = Dirichlet(alpha)
-    samples = D.sample(sample_shape=[10000]).view(-1, K+1).cpu()
-    logs = [D.log_prob(sample) for sample in samples]
-    high = samples[logs.index(max(logs))]

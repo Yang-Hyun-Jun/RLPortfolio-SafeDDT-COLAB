@@ -44,10 +44,10 @@ class DIRITester:
         self.score_net_cnet = Score().to(device)
 
         self.actor = Actor(self.score_net_actor).to(device)
-        self.critic = Critic(self.score_net_critic, header_dim=self.K).to(device)
-        self.critic_target = Critic(self.score_net_critic, header_dim=self.K).to(device)
-        self.cnet = Critic(self.score_net_cnet, header_dim=self.K).to(device)
-        self.cnet_target = Critic(self.score_net_cnet, header_dim=self.K).to(device)
+        self.critic = Critic(self.score_net_critic).to(device)
+        self.critic_target = Critic(self.score_net_critic).to(device)
+        self.cnet = Critic(self.score_net_cnet).to(device)
+        self.cnet_target = Critic(self.score_net_cnet).to(device)
 
         self.repre = repre
         self.delta = delta
