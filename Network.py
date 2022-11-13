@@ -31,6 +31,8 @@ class Score(nn.Module):
         self.output_dim = output_dim
 
         self.layer1 = nn.Linear(state1_dim+state2_dim, 128)
+        self.layer1 = nn.Linear(state1_dim+state2_dim, 64)
+
         self.layer2 = nn.Linear(128, 64)
         self.layer3 = nn.Linear(64, output_dim)
         self.hidden_act = nn.ReLU()
