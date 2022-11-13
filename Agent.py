@@ -273,11 +273,10 @@ class agent(nn.Module):
         self.loss.backward()
         self.optimizer.step()
 
-        grad_lam = -(torch.mean(c_value.detach(), dim=0) - self.alpha.to(device))
+        grad_lam = -(torch.mean(c_value.detach(), dim=0) - self.alpha)
         self.grad_lam = grad_lam
         self.lam -= self.lr2 * grad_lam
         self.lam = self.lam if self.lam >= 0 else 0
-        self.lam = self.lam.to(device)
 
     def soft_target_update(self, params, target_params):
         for param, target_param in zip(params, target_params):
