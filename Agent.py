@@ -10,6 +10,8 @@ torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 class agent(nn.Module):
     # 거래 비용
@@ -52,7 +54,7 @@ class agent(nn.Module):
 
         parameters = set(self.critic.parameters()) | set(self.actor.parameters()) | set(self.cnet.parameters())
         self.optimizer = torch.optim.Adam(params=parameters, lr=self.lr, weight_decay=1e-4)
-        self.huber = nn.SmoothL1Loss()
+        self.huber = nn.SmoothL1Loss().to(device)
         self.critic_target.load_state_dict(self.critic.state_dict())
         self.critic_target.eval()
         self.cnet_target.load_state_dict(self.cnet.state_dict())
@@ -271,10 +273,11 @@ class agent(nn.Module):
         self.loss.backward()
         self.optimizer.step()
 
-        grad_lam = -(torch.mean(c_value.detach(), dim=0) - self.alpha)
+        grad_lam = -(torch.mean(c_value.detach(), dim=0) - self.alpha.to(device))
         self.grad_lam = grad_lam
         self.lam -= self.lr2 * grad_lam
         self.lam = self.lam if self.lam >= 0 else 0
+        self.lam = self.lam.to(device)
 
     def soft_target_update(self, params, target_params):
         for param, target_param in zip(params, target_params):
