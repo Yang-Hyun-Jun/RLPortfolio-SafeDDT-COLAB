@@ -155,7 +155,7 @@ class DIRILearner:
                                              torch.tensor(portfolio, device=device).float().view(1,self.K+1,-1)).cpu().detach()[0]
 
                     a = action
-                    al = torch.cat([torch.tensor([1.1]), alpha], dim=-1).numpy()
+                    al = torch.cat([torch.tensor([0.5]), alpha], dim=-1).numpy()
                     lam = self.agent.lam
                     grad_lam = self.agent.grad_lam
                     p = self.agent.portfolio
