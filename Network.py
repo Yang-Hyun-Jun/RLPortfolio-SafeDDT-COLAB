@@ -75,7 +75,7 @@ class Actor(nn.Module):
 
         alpha = torch.cat(scores, dim=-1)
         # alpha = torch.exp(alpha)
-        alpha = torch.clamp(alpha, min=0) + 0.01
+        alpha = torch.clamp(alpha, min=0) + 0.1
         return alpha
 
     def sampling(self, s1_tensor, portfolio, repre=False):
@@ -444,3 +444,6 @@ class Critic(nn.Module):
         v = nn.Linear(32, 1)(v)
         return v
 
+if __name__ == "__main__":
+    a = torch.tensor([-3, 2]).view(1, 2)
+    print(torch.clamp(a, min=0) + 0.01)
