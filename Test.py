@@ -68,8 +68,8 @@ class DIRITester:
 
         actor_path = utils.SAVE_DIR + "/Models" + "/DirichletPortfolio_actor.pth"
         score_path = utils.SAVE_DIR + "/Models" + "/DirichletPortfolio_score.pth"
-        # self.agent.actor.load_state_dict(torch.load(actor_path, map_location=device))
-        # self.agent.actor.score_net.load_state_dict(torch.load(score_path, map_location=device))
+        self.agent.actor.load_state_dict(torch.load(actor_path, map_location=device))
+        self.agent.actor.score_net.load_state_dict(torch.load(score_path, map_location=device))
 
     def check_frequency(self, action):
         for a in action:
