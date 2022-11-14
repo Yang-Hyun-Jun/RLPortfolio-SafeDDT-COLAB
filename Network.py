@@ -74,7 +74,8 @@ class Actor(nn.Module):
             scores.append(globals()[f"score{j+1}"])
 
         alpha = torch.cat(scores, dim=-1)
-        alpha = torch.exp(alpha)
+        # alpha = torch.exp(alpha)
+        alpha = torch.clamp(alpha, min=0) + 1e-20
         return alpha
 
     def sampling(self, s1_tensor, portfolio, repre=False):
@@ -442,3 +443,4 @@ class Critic(nn.Module):
         v = nn.ReLU()(v)
         v = nn.Linear(32, 1)(v)
         return v
+
