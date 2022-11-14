@@ -75,7 +75,7 @@ class Actor(nn.Module):
 
         alpha = torch.cat(scores, dim=-1)
         # alpha = torch.exp(alpha)
-        alpha = torch.clamp(alpha, min=0) + 1e-20
+        alpha = torch.clamp(alpha, min=0) + 1e-10
         return alpha
 
     def sampling(self, s1_tensor, portfolio, repre=False):
