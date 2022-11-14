@@ -117,7 +117,8 @@ class DIRITester:
             metrics.profitlosses.append(self.agent.profitloss)
             metrics.balances.append(self.agent.balance)
             metrics.cum_fees.append(self.agent.cum_fee)
-            if steps_done % 50 == 0:
+            if steps_done % 10 == 0:
+                print(f"alpha:{self.agent.actor.alpha}")
                 print(f"balance:{self.agent.balance}")
                 print(f"stocks:{self.agent.num_stocks}")
                 print(f"actions:{action}")

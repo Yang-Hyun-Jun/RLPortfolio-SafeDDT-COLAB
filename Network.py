@@ -86,6 +86,7 @@ class Actor(nn.Module):
         B = alpha.shape[0]  # Batch num
         N = alpha.shape[1]  # Asset num + 1
 
+        self.alpha = alpha
         #Representative value
         if repre == "mean":
             sampled_p = dirichlet.mean
