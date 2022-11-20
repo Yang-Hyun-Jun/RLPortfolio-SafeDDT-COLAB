@@ -245,20 +245,20 @@ class agent(nn.Module):
         # Critic loss
         with torch.no_grad():
             next_value = self.critic_target(ns, npf)
-            target = reward + self.discount_factor * next_value * (1-done)
-            target = eps_clip_critic * ratio.detach() * target
+            v_target = reward + self.discount_factor * next_value * (1-done)
+            v_target = v_target * torch.clamp(ratio.detach(), 1-eps_clip, 1+eps_clip)
 
         value = self.critic(s, pf)
-        critic_loss = self.huber(value, target)
+        critic_loss = self.huber(value, v_target)
 
         # Cnet loss
         with torch.no_grad():
             next_cost = self.cnet_target(ns, npf)
-            target = cost + self.discount_factor * next_cost * (1-done)
-            target = eps_clip_critic * ratio.detach() * target
+            c_target = cost + self.discount_factor * next_cost * (1-done)
+            c_target = c_target * torch.clamp(ratio.detach(), 1-eps_clip, 1+eps_clip)
 
         c_value = self.cnet(s, pf)
-        c_loss = self.huber(c_value, target)
+        c_loss = self.huber(c_value, c_target)
 
         # Actor loss
         td_advantage = r + self.discount_factor * self.critic(ns, npf) * (1-done) - value
